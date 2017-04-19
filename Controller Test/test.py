@@ -21,6 +21,14 @@ global isReversing
 isReversing = False
 global isForward
 isForward = False
+global left
+left = False
+global isLeft
+isLeft = False
+global right
+right = False
+global isRight
+isRight = False
 
 spd = 200
 
@@ -41,7 +49,6 @@ def quit_fun(event):
 
 @controller.event
 def on_button(button, pressed):
-	print 'button', button, pressed
 	if button == 14 and pressed == 1:
 		changeSpeed(100)
 	if button == 14 and pressed == 0:
@@ -53,6 +60,8 @@ def on_button(button, pressed):
 def on_axis(axis, value):
 	global forward
 	global reverse
+	global left
+	global right
 	if(axis == "right_trigger"):
 		if(value > 0):
 			forward = True
@@ -67,6 +76,20 @@ def on_axis(axis, value):
 		else:
 			reverse = False
 
+	if(axis == "l_thumb_x"):
+		if(value < -.1):
+			left = True
+			right = False
+		else:
+			left = False	
+
+	if(axis == "l_thumb_x"):
+		if(value > .1):
+			right = True
+			left = False
+		else:
+			right = False	
+
 while True:
 	controller.dispatch_events()
 	time.sleep(.01)
@@ -80,4 +103,15 @@ while True:
 		tcpCliSock.send('stop')
 		isReversing = False
 		isForward = False
+	
+	if(left and not isLeft):
+		tcpCliSock.send('left')
+		isLeft = True
+	elif(right and not isRight):
+		tcpCliSock.send('right')
+		isRight = True
+	elif((isRight and not right) or (isLeft and not left)):
+		tcpCliSock.send('home')
+		isRight = False
+		isLeft = False
 	
