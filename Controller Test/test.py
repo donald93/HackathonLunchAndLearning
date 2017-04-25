@@ -30,6 +30,23 @@ right = False
 global isRight
 isRight = False
 
+global cUp 
+cUp = False
+global cDown
+cDown = False
+global cLeft
+cLeft = False
+global cRight
+cRight = False
+global isCUp
+isCUp = False
+global isCDown
+isCDown = False
+global isCLeft
+isCLeft = False
+global isCRight
+isCRight = False
+
 spd = 200
 
 def changeSpeed(speed):
@@ -62,6 +79,10 @@ def on_axis(axis, value):
 	global reverse
 	global left
 	global right
+	global cLeft
+	global cRight
+	global cUp
+	global cDown
 	if(axis == "right_trigger"):
 		if(value > 0):
 			forward = True
@@ -90,6 +111,34 @@ def on_axis(axis, value):
 		else:
 			right = False	
 
+	if(axis == "r_thumb_x"):
+		if(value > .1):
+			cRight = True
+			cLeft = False
+		else:
+			cRight = False
+	
+	if(axis == "r_thumb_x"):
+		if(value < -.1):
+			cLeft = True
+			cRight = False
+		else:
+			cLeft = False
+	
+	if(axis == "r_thumb_y"):
+		if(value > .1):
+			cUp = True
+			cDown = False
+		else:
+			cUp = False
+
+	if(axis == "r_thumb_y"):
+		if(value < -.1):
+			cDown = True
+			cUp = False
+		else:
+			cDown = False
+
 while True:
 	controller.dispatch_events()
 	time.sleep(.01)
@@ -114,4 +163,22 @@ while True:
 		tcpCliSock.send('home')
 		isRight = False
 		isLeft = False
+
+	if(cLeft and not isCLeft):
+		tcpCliSock.send('x-')
+		isCLeft = True
+	elif(cRight and not isCRight):
+		tcpCliSock.send('x+')
+		isCRight = True
+	
+	if(cUp and not isCUp):
+		tcpCliSock.send('y+')
+		isCUp = True
+	elif(cDown and not isCDown):
+		tcpCliSock.send('y-')
+		isCDown = True
+	# elif((isCRight and not cRight) or (isCLeft and not cLeft)):
+	# 	tcpCliSock.send('xy_home')
+	# 	isCLeft = False
+	# 	isCRight = False
 	
